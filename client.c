@@ -29,13 +29,25 @@ int main(int argc, char **argv) {
                 return -1;
         }
         #define MAX_MSG 256
-        char msg[MAX_MSG], resp[MAX_MSG];
-        bzero(msg, MAX_MSG);
+        char requisicao[MAX_MSG], resp[MAX_MSG];
+        bzero(requisicao, MAX_MSG);
         printf("<telnet teletype>: ");
-        fgets(msg, MAX_MSG, stdin);
+        fgets(requisicao, MAX_MSG, stdin);
+
+        //get arquivo, verifica cache
+        //verifica data d arquivo e envia junto com o get
+        //le a resposta, se nao modificou, só utiliza do cache
+        //se modificou ira receber outro arquivo para substituir
+        
+        //put arquivo, envia o arquivo pelo socket e espera resposta
+        
+        //delete arquivo e espera resposta
+        
+        //outro comando nao faz nada
+
         int ns, nr;
         // write
-        ns = write(cfd, msg, strlen(msg));
+        ns = write(cfd, requisicao, MAX_MSG);
         if (ns == -1) {
                 perror("write()");
                 return -1;

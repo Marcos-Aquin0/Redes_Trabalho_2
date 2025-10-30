@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <string.h>
 
 #define MAX_REQ 64536
 #define MAX_CONN 1000
@@ -30,7 +31,7 @@ void *handle_client(void *args) {
 		int cfd = *(int *)args;
 		// recv
 		int nr, ns;
-		unsigned char requisicao[MAX_REQ];
+		char requisicao[MAX_REQ], resposta[MAX_REQ];
 		bzero(requisicao, MAX_REQ);
 		nr = recv(tclients[cfd].cfd, requisicao, MAX_REQ, 0);
 		if (nr < 0) {
@@ -41,8 +42,24 @@ void *handle_client(void *args) {
 		printf("Recebeu do cliente (%s:%d): '%s'\n", inet_ntoa(tclients[cfd].caddr.sin_addr),
 				ntohs(tclients[cfd].caddr.sin_port), requisicao);
 
+		const char delimiters[] = " \n\r";
+		char *command = strtok(requisicao, delimiters);
+
+		if (strcmp(command, "GET") == 0) {
+			strcpy(resposta, "200 OK\n");
+		} 
+		else if (strcmp(command, "PUT") == 0) {
+			strcpy(resposta, "200 OK\n");
+		} 
+		else if (strcmp(command, "DELETE") == 0) {
+			strcpy(resposta, "200 OK\n");
+		} 
+		else {
+			strcpy(resposta, "400 BAD REQUEST\n");
+		}
+		
 		// send
-		ns = send(cfd, requisicao, nr, 0);
+		ns = send(cfd, resposta, nr, 0);
 		if (ns < 0){
 			perror("erro no send()");
 			return NULL;

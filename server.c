@@ -20,14 +20,14 @@ typedef struct targs targs;
 
 targs tclients[MAX_CONN + 3];
 
-void strfile(char *req, char *dest, int max) {
-	int i;
-	for (i = 0; i < max -1 && src[i] != '\0' && src[i] != '\n' && src[i] != ' '; i++) {
-		dest[i] = src[i];
-	}
-	dest[i] = '\0';
-	printf("[LOG] Endereço: %s", dest);
-}
+// void strfile(char *req, char *dest, int max) {
+// 	int i;
+// 	for (i = 0; i < max -1 && src[i] != '\0' && src[i] != '\n' && src[i] != ' '; i++) {
+// 		dest[i] = src[i];
+// 	}
+// 	dest[i] = '\0';
+// 	printf("[LOG] Endereço: %s", dest);
+// }
 
 void init(targs *tclients, int n){
 	int i;
@@ -51,13 +51,13 @@ void *handle_client(void *args) {
 		printf("Recebeu do cliente (%s:%d): '%s'\n", inet_ntoa(tclients[cfd].caddr.sin_addr),
 				ntohs(tclients[cfd].caddr.sin_port), requisicao);
 
-		const char delimiter = "GET ";
-		char *tok = strtok(requisicao, delimiter);
-		if (tok) {
-			// pegar ate o fim do endereço
-			tok = strfile(tok, file, MAX_REQ);
-		}
 
+		const char delimiters[] = " \n";
+		char *command = strtok(requisicao, delimiters);
+		char *filename = strtok(NULL, delimiters);
+		char *timestamp = strtok(NULL, delimiters);
+		
+		
 		if (strcmp(command, "GET") == 0) {
 			strcpy(resposta, "200 OK\n");
 			// "304 NOT MODIFIED\n"
@@ -76,6 +76,9 @@ void *handle_client(void *args) {
 
 		} 
 		else if (strcmp(command, "DELETE") == 0) {
+			if(filename == NULL){
+				strcpy(resposta, "400 BAD REQUEST\n");
+			}
 			strcpy(resposta, "200 OK\n");
 			// "404 NOT FOUND\n"
 			// "500 INTERNAL SERVER ERROR\n"

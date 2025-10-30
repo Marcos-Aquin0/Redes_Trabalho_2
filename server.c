@@ -20,6 +20,15 @@ typedef struct targs targs;
 
 targs tclients[MAX_CONN + 3];
 
+void strfile(char *req, char *dest, int max) {
+	int i;
+	for (i = 0; i < max -1 && src[i] != '\0' && src[i] != '\n' && src[i] != ' '; i++) {
+		dest[i] = src[i];
+	}
+	dest[i] = '\0';
+	printf("[LOG] Endereço: %s", dest);
+}
+
 void init(targs *tclients, int n){
 	int i;
 	for (i = 0; i< MAX_CONN + 3; i++) {
@@ -42,8 +51,12 @@ void *handle_client(void *args) {
 		printf("Recebeu do cliente (%s:%d): '%s'\n", inet_ntoa(tclients[cfd].caddr.sin_addr),
 				ntohs(tclients[cfd].caddr.sin_port), requisicao);
 
-		const char delimiters[] = " \n\r";
-		char *command = strtok(requisicao, delimiters);
+		const char delimiter = "GET ";
+		char *tok = strtok(requisicao, delimiter);
+		if (tok) {
+			// pegar ate o fim do endereço
+			tok = strfile(tok, file, MAX_REQ);
+		}
 
 		if (strcmp(command, "GET") == 0) {
 			strcpy(resposta, "200 OK\n");

@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <string.h>
 
+
+
 int main(int argc, char **argv) {
         if (argc !=3) {
                 printf("Usage: %s <dst_ip> <dst_port>\n", argv[0]);
@@ -35,6 +37,7 @@ int main(int argc, char **argv) {
         fgets(requisicao, MAX_MSG, stdin);
 
         //get arquivo, verifica cache
+
         //verifica data d arquivo e envia junto com o get
         //le a resposta, se nao modificou, só utiliza do cache
         //se modificou ira receber outro arquivo para substituir
@@ -64,5 +67,6 @@ int main(int argc, char **argv) {
         close(cfd);
         return 0;
 }
+
 
 

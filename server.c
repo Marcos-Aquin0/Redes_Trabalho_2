@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <string.h>
+#include <fcntl.h>
 
 #define MAX_REQ 64536
 #define MAX_CONN 1000
@@ -48,14 +49,31 @@ void *handle_client(void *args) {
 		char *filename = strtok(NULL, delimiters);
 		char *timestamp = strtok(NULL, delimiters);
 		
-		
+
 		if (strcmp(command, "GET") == 0) {
-			strcpy(resposta, "200 OK\n");
-			// "304 NOT MODIFIED\n"
-			// "404 NOT FOUND\n"
-			// "500 INTERNAL SERVER ERROR\n"
-			//encaminhar arquivo junto
-		
+					int fd = open(filename,O_RDONLY);
+
+			if (fd == -1){
+				strcpy(resposta, "400 Not Found\n");
+			}	
+			else{
+				struct stat st;
+				stat(filename, &st);
+				if (compare(st.st_mtime, time){
+					close(fd);
+				} else {
+					char buffer[128];
+					ssize_t bytesLidos = read(fd, buffer, sizeof(buffer)-1);
+					if (bytesLidos == -1){ 
+						perror("Erro ao ler o arquivo");
+						close(fd);
+						exit(1);
+					strcpy(resposta, "200 OK\n");
+					buffer[bytesLidos] = '\0';
+					close(fd);
+					strcpy(arquivo, buffer);	
+				}
+			}			
 		} 
 		else if (strcmp(command, "PUT") == 0) {
 			if(filename == NULL){
@@ -110,6 +128,9 @@ void *handle_client(void *args) {
 		if (ns < 0){
 			perror("erro no send()");
 			return NULL;
+		}
+		if(arquivo[0] == '\0'){
+			ns2 = send(cfd, arquivo, nr, 0);
 		}
 		// close
 		close(tclients[cfd].cfd);

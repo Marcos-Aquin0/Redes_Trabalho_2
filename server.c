@@ -47,17 +47,31 @@ void *handle_client(void *args) {
 
 		if (strcmp(command, "GET") == 0) {
 			strcpy(resposta, "200 OK\n");
+			// "304 NOT MODIFIED\n"
+			// "404 NOT FOUND\n"
+			// "500 INTERNAL SERVER ERROR\n"
+			//encaminhar arquivo junto
+		
 		} 
 		else if (strcmp(command, "PUT") == 0) {
 			strcpy(resposta, "200 OK\n");
+			//se o arquivo ja existe, substituir
+			// "201 CREATED\n"
+			// "404 NOT FOUND\n"
+			// "500 INTERNAL SERVER ERROR\n"
+			//receber e salvar o arquivo
+
 		} 
 		else if (strcmp(command, "DELETE") == 0) {
 			strcpy(resposta, "200 OK\n");
+			// "404 NOT FOUND\n"
+			// "500 INTERNAL SERVER ERROR\n"
+			//apagar o arquivo
 		} 
 		else {
 			strcpy(resposta, "400 BAD REQUEST\n");
 		}
-		
+
 		// send
 		ns = send(cfd, resposta, nr, 0);
 		if (ns < 0){

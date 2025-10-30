@@ -58,6 +58,20 @@ void *handle_client(void *args) {
 		
 		} 
 		else if (strcmp(command, "PUT") == 0) {
+			if(filename == NULL){
+				strcpy(resposta, "400 Bad Request\n");
+			} else {
+				char *old_filename = "cliente/";
+				strcat(old_filename, filename);
+				char path_file[200] = "servidor/";
+				strcat(path_file, filename);
+				if (rename(old_filename, path_file) == 0) {
+					strcpy(resposta, "201 CREATED\n");
+				} else {
+					strcpy(resposta, "500 INTERNAL SERVER ERROR\n");
+				}
+			}
+			
 			strcpy(resposta, "200 OK\n");
 			//se o arquivo ja existe, substituir
 			// "201 CREATED\n"

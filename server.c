@@ -20,15 +20,6 @@ typedef struct targs targs;
 
 targs tclients[MAX_CONN + 3];
 
-// void strfile(char *req, char *dest, int max) {
-// 	int i;
-// 	for (i = 0; i < max -1 && src[i] != '\0' && src[i] != '\n' && src[i] != ' '; i++) {
-// 		dest[i] = src[i];
-// 	}
-// 	dest[i] = '\0';
-// 	printf("[LOG] Endereço: %s", dest);
-// }
-
 void init(targs *tclients, int n){
 	int i;
 	for (i = 0; i< MAX_CONN + 3; i++) {
@@ -77,12 +68,24 @@ void *handle_client(void *args) {
 		} 
 		else if (strcmp(command, "DELETE") == 0) {
 			if(filename == NULL){
-				strcpy(resposta, "400 BAD REQUEST\n");
+				strcpy(resposta, "400 Bad Request\n");
+			} else {
+				//apagar o arquivo
+				char path_file[200] = "servidor/";
+				strcat(path_file, filename);
+				
+				FILE* file = fopen(path_file, "r");
+				if(file != NULL){
+					fclose(file);
+					if (remove(path_file) == 0){
+						strcpy(resposta, "200 OK\n");
+					} else {
+						strcpy(resposta, "500 INTERNAL SERVER ERROR\n");
+					}
+				} else {
+					strcpy(resposta, "404 NOT FOUND\n");
+				}
 			}
-			strcpy(resposta, "200 OK\n");
-			// "404 NOT FOUND\n"
-			// "500 INTERNAL SERVER ERROR\n"
-			//apagar o arquivo
 		} 
 		else {
 			strcpy(resposta, "400 BAD REQUEST\n");

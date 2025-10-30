@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
         //put arquivo, envia o arquivo pelo socket e espera resposta
         
         //delete arquivo e espera resposta
-        
+
         //outro comando nao faz nada
 
         int ns, nr;

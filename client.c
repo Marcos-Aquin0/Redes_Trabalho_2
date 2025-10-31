@@ -43,6 +43,7 @@ int main(int argc, char **argv) {
         //se modificou ira receber outro arquivo para substituir
         
         //put arquivo, envia o arquivo pelo socket e espera resposta
+        //verifica se o arquivo existe
         
         //delete arquivo e espera resposta
 

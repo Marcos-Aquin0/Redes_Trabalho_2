@@ -93,18 +93,11 @@ void *handle_client(void *args) {
 			char path_file[200] = "servidor/";
 			strcat(path_file, filename);
 			if (rename(old_filename, path_file) == 0) {
-				strcpy(resposta, "201 CREATED\n");
+				strcpy(resposta, "201 Created\n");
 			} else {
-				strcpy(resposta, "500 INTERNAL SERVER ERROR\n");
+				strcpy(resposta, "500 Internal Server Error\n");
 			}
 		}
-
-		//se o arquivo ja existe, substituir
-		// "201 CREATED\n"
-		// "404 NOT FOUND\n"
-		// "500 INTERNAL SERVER ERROR\n"
-		//receber e salvar o arquivo
-
 	} else if (strcmp(command, "DELETE") == 0) {
 		if (filename == NULL) {
 			strcpy(resposta, "400 Bad Request\n");
@@ -119,14 +112,14 @@ void *handle_client(void *args) {
 				if (remove(path_file) == 0) {
 					strcpy(resposta, "200 OK\n");
 				} else {
-					strcpy(resposta, "500 INTERNAL SERVER ERROR\n");
+					strcpy(resposta, "500 Internal Server Error\n");
 				}
 			} else {
-				strcpy(resposta, "404 NOT FOUND\n");
+				strcpy(resposta, "404 Not Found\n");
 			}
 		}
 	} else {
-		strcpy(resposta, "400 BAD REQUEST\n");
+		strcpy(resposta, "400 Bad Request\n");
 	}
 
 	// send

@@ -30,7 +30,7 @@ void init(targs *tclients, int n){
 }
 
 int compare(time_t file_time, time_t timestamp) {
-	return difftime(file_time, timestamp) >0;
+	return difftime(file_time, timestamp) > 0;
 }
 
 void *handle_client(void *args) {
@@ -44,29 +44,36 @@ void *handle_client(void *args) {
 		perror("erro no recv()");
 		return NULL;
 	}
-
+	requisicao[nr-1] = '\0';
 	printf("Recebeu do cliente (%s:%d): '%s'\n", inet_ntoa(tclients[cfd].caddr.sin_addr),
 			ntohs(tclients[cfd].caddr.sin_port), requisicao);
-
+	char req_copy[MAX_REQ];
+	strcpy(req_copy, requisicao);
 	const char delimiters[] = " \n";
-	char *command = strtok(requisicao, delimiters);
-	char *filename = strtok(NULL, delimiters);
-	char *timestamp = strtok(NULL, delimiters);
-
+	char *command = strtok(req_copy, delimiters);
+	char* filename;
+	char* timestamp;
+	if (command) { 
+		filename = strtok(NULL, delimiters);
+		if (filename) {
+			timestamp = strtok(NULL, delimiters);
+		}
+	}
 	if (strcmp(command, "GET") == 0) {
-		int fd = open(filename, O_RDONLY);
+		char path[256] = "servidor/";
+		strcat(path, filename);
+		int fd = open(path, O_RDONLY);
 
 		if (fd == -1) {
 			strcpy(resposta, "404 Not Found\n");
 		} else {
 			struct stat st;
-			if (stat(filename, &st) == -1) {
+			if (stat(path, &st) == -1) {
 				perror("Erro ao obter stat");
 				strcpy(resposta, "500 Internal Server Error\n");
 				close(fd);
 			}
-			time_t ts = (time_t)atol(timestamp);
-			if (compare(st.st_mtime, ts)) {
+			if (timestamp && compare(st.st_mtime, (time_t)atol(timestamp))) {
 				sprintf(resposta, "304 Not Modified\n%ld\n", st.st_mtime);
 				close(fd);
 			} else {

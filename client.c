@@ -6,8 +6,8 @@
 #include <strings.h>
 #include <unistd.h>
 #include <string.h>
-
-
+#include <sys/stat.h>
+#include <fcntl.h>
 
 int main(int argc, char **argv) {
         if (argc !=3) {
@@ -31,12 +31,42 @@ int main(int argc, char **argv) {
                 return -1;
         }
         #define MAX_MSG 256
-        char requisicao[MAX_MSG], resp[MAX_MSG];
+	#define MAX_ARQ 8192
+        char requisicao[MAX_MSG], resp[MAX_MSG], arq[MAX_ARQ];
         bzero(requisicao, MAX_MSG);
         printf("<telnet teletype>: ");
         fgets(requisicao, MAX_MSG, stdin);
+	requisicao[strcspn(requisicao, "\n")] = '\0';
+	
+	char req_copy[MAX_MSG];
+	strcpy(req_copy, requisicao);
 
-        //get arquivo, verifica cache
+	char* delimiters = " \n";
+	char* tok = strtok(req_copy, delimiters);
+	if (tok && (strcmp(tok, "GET") == 0)) {
+		char* filename = strtok(NULL, delimiters);
+		if(filename != NULL) {
+			char clientDir[MAX_MSG] = "cliente/";
+			strcat(clientDir, filename);
+
+			int fdTest = open(clientDir, O_RDONLY);
+			
+			// se entrar aqui significa que existe o arquivo em cache
+			if (fdTest != -1){
+				struct stat st;
+				if (fstat(fdTest, &st) == 0){
+					time_t last_modify = st.st_mtime;
+					bzero(requisicao, MAX_MSG);
+					sprintf(requisicao, "GET %s %ld", filename, last_modify);
+				} 
+				close(fdTest);
+			} else {
+				bzero(requisicao, MAX_MSG);
+				sprintf(requisicao, "GET %s", filename);
+			}
+		}
+	}
+	//get arquivo, verifica cache
 
         //verifica data d arquivo e envia junto com o get
         //le a resposta, se nao modificou, só utiliza do cache
@@ -64,6 +94,25 @@ int main(int argc, char **argv) {
                 return -1;
         }
 	printf("\n%s", resp);
+	char* tokRes = strtok(resp, delimiters); 
+	if (strcmp(tokRes, "200") == 0) {
+		int nt;
+		if (strcmp(tok, "GET") == 0) {
+			nt = read(cfd, arq, MAX_ARQ);
+			if (nt == -1) {
+				perror("read()");
+				return -1;
+			}
+			arq[nt] = '\0';
+			printf("\n%s", arq);
+		
+			FILE* f = fopen("cliente/arquivo_upload.txt", "wb");
+			if (f == NULL) {
+				perror("Erro ao receber o arquivo");
+			}
+			fprintf(f, "%s\n", arq);
+		}
+	}
         // close
         close(cfd);
         return 0;

@@ -1,0 +1,3 @@
+texto
+textoo 
+teste de arquivo cache   

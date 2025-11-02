@@ -44,7 +44,7 @@ void *handle_client(void *args) {
 		perror("erro no recv()");
 		return NULL;
 	}
-	requisicao[nr-1] = '\0';
+	requisicao[nr] = '\0';
 	printf("Recebeu do cliente (%s:%d): '%s'\n", inet_ntoa(tclients[cfd].caddr.sin_addr),
 			ntohs(tclients[cfd].caddr.sin_port), requisicao);
 	char req_copy[MAX_REQ];
@@ -73,7 +73,7 @@ void *handle_client(void *args) {
 				strcpy(resposta, "500 Internal Server Error\n");
 				close(fd);
 			}
-			if (timestamp && compare(st.st_mtime, (time_t)atol(timestamp))) {
+			if (timestamp && compare(st.st_mtime, (time_t)atol(timestamp)) <=0) {
 				sprintf(resposta, "304 Not Modified\n%ld\n", st.st_mtime);
 				close(fd);
 			} else {

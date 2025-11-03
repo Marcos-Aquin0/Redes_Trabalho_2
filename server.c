@@ -160,13 +160,13 @@ void *handle_client(void *args) {
 	}
 
 	// send
-	ns = send(tclients[cfd].cfd, resposta, strlen(resposta), 0);
+	ns = send(cfd, resposta, strlen(resposta), 0);
 	if (ns < 0) {
 		perror("erro no send()");
 		return NULL;
 	}
 	if (arquivo[0] != '\0') {
-		int ns2 = send(tclients[cfd].cfd, arquivo, strlen(arquivo), 0);
+		int ns2 = send(cfd, arquivo, strlen(arquivo), 0);
 		if (ns2 < 0) {
 			perror("erro no send()");
 			return NULL;

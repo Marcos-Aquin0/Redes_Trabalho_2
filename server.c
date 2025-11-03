@@ -121,7 +121,21 @@ void *handle_client(void *args) {
 			}
 		}
 	} else if (strcmp(command, "PUT") == 0) {
-		receive_file(cfd, "servidor/received_file.txt");
+		if (filename == NULL) {
+			strcpy(resposta, "400 Bad Request\n");
+		} else {
+			// Extract just the filename from the path
+			char *basename = strrchr(filename, '/');
+			if (basename) {
+				basename++; // Skip the '/'
+			} else {
+				basename = filename; // No path, use as is
+			}
+			char path[256] = "servidor/";
+			strcat(path, basename);
+			receive_file(tclients[cfd].cfd, path);
+			strcpy(resposta, "200 OK\n");
+		}
 	} else if (strcmp(command, "DELETE") == 0) {
 		if (filename == NULL) {
 			strcpy(resposta, "400 Bad Request\n");
@@ -147,13 +161,13 @@ void *handle_client(void *args) {
 	}
 
 	// send
-	ns = send(cfd, resposta, strlen(resposta), 0);
+	ns = send(tclients[cfd].cfd, resposta, strlen(resposta), 0);
 	if (ns < 0) {
 		perror("erro no send()");
 		return NULL;
 	}
 	if (arquivo[0] != '\0') {
-		int ns2 = send(cfd, arquivo, strlen(arquivo), 0);
+		int ns2 = send(tclients[cfd].cfd, arquivo, strlen(arquivo), 0);
 		if (ns2 < 0) {
 			perror("erro no send()");
 			return NULL;

@@ -124,16 +124,17 @@ int main(int argc, char **argv) {
 
         //outro comando nao faz nada
 
-        // SEND FILE ADICIONADO POR FELIPE NAO SEI SE É AQUI MESMO
-        send_file(cfd, "server.c");
-
-        
         int ns, nr;
         // write
         ns = write(cfd, requisicao, MAX_MSG);
         if (ns == -1) {
                 perror("write()");
                 return -1;
+        }
+        
+        // Send file for PUT command
+        if (strcmp(tok, "PUT") == 0 && filename != NULL) {
+                send_file(cfd, filename);
         }
         // read
 	bzero(resp, MAX_MSG);

@@ -124,12 +124,11 @@ void *handle_client(void *args) {
 		if (filename == NULL) {
 			strcpy(resposta, "400 Bad Request\n");
 		} else {
-			// Extract just the filename from the path
 			char *basename = strrchr(filename, '/');
 			if (basename) {
-				basename++; // Skip the '/'
+				basename++; 
 			} else {
-				basename = filename; // No path, use as is
+				basename = filename; 
 			}
 			char path[256] = "servidor/";
 			strcat(path, basename);

@@ -111,18 +111,6 @@ int main(int argc, char **argv) {
                         }
                 }
         }
-	//get arquivo, verifica cache
-
-        //verifica data d arquivo e envia junto com o get
-        //le a resposta, se nao modificou, só utiliza do cache
-        //se modificou ira receber outro arquivo para substituir
-        
-        //put arquivo, envia o arquivo pelo socket e espera resposta
-        //verifica se o arquivo existe
-        
-        //delete arquivo e espera resposta
-
-        //outro comando nao faz nada
 
         int ns, nr;
         // write

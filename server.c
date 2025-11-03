@@ -12,6 +12,7 @@
 
 #define MAX_REQ 64536
 #define MAX_CONN 1000
+#define BUFFER_SIZE 4096
 
 struct targs {
 	pthread_t tid;
@@ -27,6 +28,34 @@ void init(targs *tclients, int n){
 	for (i = 0; i< MAX_CONN + 3; i++) {
 		tclients[i].cfd = -1;
 	}
+}
+
+void receive_file(int socket_fd, const char *output_filename) {
+    int file_fd = open(output_filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (file_fd < 0) {
+        perror("Error opening output file");
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    ssize_t bytes_received;
+
+    while ((bytes_received = recv(socket_fd, buffer, BUFFER_SIZE, 0)) > 0) {
+    
+        ssize_t bytes_written = write(file_fd, buffer, bytes_received);
+        if (bytes_written < 0) {
+            perror("Error writing to file");
+            close(file_fd);
+            return;
+        }
+    }
+
+    if (bytes_received < 0) {
+        perror("Error receiving file");
+    }
+
+    close(file_fd);
+    printf("File received successfully.\n");
 }
 
 int compare(time_t file_time, time_t timestamp) {
@@ -92,19 +121,7 @@ void *handle_client(void *args) {
 			}
 		}
 	} else if (strcmp(command, "PUT") == 0) {
-		if (filename == NULL) {
-			strcpy(resposta, "400 Bad Request\n");
-		} else {
-			char old_filename[200] = "cliente/";
-			strcat(old_filename, filename);
-			char path_file[200] = "servidor/";
-			strcat(path_file, filename);
-			if (rename(old_filename, path_file) == 0) {
-				strcpy(resposta, "201 Created\n");
-			} else {
-				strcpy(resposta, "500 Internal Server Error\n");
-			}
-		}
+		receive_file(cfd, "servidor/received_file.txt");
 	} else if (strcmp(command, "DELETE") == 0) {
 		if (filename == NULL) {
 			strcpy(resposta, "400 Bad Request\n");

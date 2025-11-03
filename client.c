@@ -9,6 +9,47 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
+#include <sys/types.h>
+
+#define BUFFER_SIZE 4096
+
+
+void send_file(int socket_fd, const char *filename) {
+    int file_fd = open(filename, O_RDONLY);
+    if (file_fd < 0) {
+        perror("Error opening file");
+        return;
+    }
+
+    char buffer[BUFFER_SIZE];
+    ssize_t bytes_read;
+
+    
+    while ((bytes_read = read(file_fd, buffer, BUFFER_SIZE)) > 0) {
+
+        ssize_t total_bytes_sent = 0;
+        while (total_bytes_sent < bytes_read) {
+            ssize_t bytes_sent = send(socket_fd, 
+                                    buffer + total_bytes_sent, 
+                                    bytes_read - total_bytes_sent, 
+                                    0);
+            
+            if (bytes_sent < 0) {
+                perror("Error sending file");
+                close(file_fd);
+                return;
+            }
+            total_bytes_sent += bytes_sent;
+        }
+    }
+
+    if (bytes_read < 0) {
+        perror("Error reading from file");
+    }
+
+    close(file_fd);
+    printf("File sent successfully.\n");
+}
 
 int main(int argc, char **argv) {
         if (argc !=3) {
@@ -83,6 +124,10 @@ int main(int argc, char **argv) {
 
         //outro comando nao faz nada
 
+        // SEND FILE ADICIONADO POR FELIPE NAO SEI SE É AQUI MESMO
+        send_file(cfd, "server.c");
+
+        
         int ns, nr;
         // write
         ns = write(cfd, requisicao, MAX_MSG);

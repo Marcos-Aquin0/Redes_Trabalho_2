@@ -33,7 +33,7 @@ void init(targs *tclients, int n){
 void receive_file(int socket_fd, const char *output_filename) {
     int file_fd = open(output_filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (file_fd < 0) {
-        perror("Error opening output file");
+        perror("500 Internal Server Error\n");
         return;
     }
 
@@ -44,18 +44,18 @@ void receive_file(int socket_fd, const char *output_filename) {
     
         ssize_t bytes_written = write(file_fd, buffer, bytes_received);
         if (bytes_written < 0) {
-            perror("Error writing to file");
+            perror("500 Internal Server Error\n");
             close(file_fd);
             return;
         }
     }
 
     if (bytes_received < 0) {
-        perror("Error receiving file");
+        perror("500 Internal Server Error\n");
     }
 
     close(file_fd);
-    printf("File received successfully.\n");
+    printf("200 OK\n");
 }
 
 int compare(time_t file_time, time_t timestamp) {
@@ -134,7 +134,6 @@ void *handle_client(void *args) {
 			char path[256] = "servidor/";
 			strcat(path, basename);
 			receive_file(tclients[cfd].cfd, path);
-			strcpy(resposta, "200 OK\n");
 		}
 	} else if (strcmp(command, "DELETE") == 0) {
 		if (filename == NULL) {

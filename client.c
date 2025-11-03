@@ -136,6 +136,7 @@ int main(int argc, char **argv) {
         if (strcmp(tok, "PUT") == 0 && filename != NULL) {
                 send_file(cfd, filename);
         }
+        
         // read
 	bzero(resp, MAX_MSG);
         nr = read(cfd, resp, MAX_MSG);

@@ -14,11 +14,11 @@
 #define BUFFER_SIZE 4096
 
 
-void send_file(int socket_fd, const char *filename) {
+int send_file(int socket_fd, const char *filename) {
     int file_fd = open(filename, O_RDONLY);
     if (file_fd < 0) {
         perror("Error opening file");
-        return;
+        return -1;
     }
 
     char buffer[BUFFER_SIZE];
@@ -37,7 +37,7 @@ void send_file(int socket_fd, const char *filename) {
             if (bytes_sent < 0) {
                 perror("Error sending file");
                 close(file_fd);
-                return;
+                return -1;
             }
             total_bytes_sent += bytes_sent;
         }
@@ -48,7 +48,7 @@ void send_file(int socket_fd, const char *filename) {
     }
 
     close(file_fd);
-    printf("File sent successfully.\n");
+    return 0;
 }
 
 int main(int argc, char **argv) {
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
         saddr.sin_family = AF_INET;
         saddr.sin_addr.s_addr = inet_addr(argv[1]);
 
-        // connet
+        // connect
         if (connect(cfd, (struct sockaddr*) &saddr, sizeof(struct sockaddr_in)) == -1) {
                 perror("connect()");
                 return -1;
@@ -120,9 +120,11 @@ int main(int argc, char **argv) {
                 return -1;
         }
         
-        // Send file for PUT command
         if (strcmp(tok, "PUT") == 0 && filename != NULL) {
-                send_file(cfd, filename);
+                char clientDir[MAX_MSG] = "cliente/";
+                strcat(clientDir, filename);
+                send_file(cfd, clientDir);
+                shutdown(cfd, SHUT_WR);
         }
         
         // read

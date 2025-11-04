@@ -95,7 +95,6 @@ int main(int argc, char **argv) {
         
                                 int fdTest = open(clientDir, O_RDONLY);
                                 
-                                // se entrar aqui significa que existe o arquivo em cache
                                 if (fdTest != -1){
                                         struct stat st;
                                         if (fstat(fdTest, &st) == 0){
@@ -113,19 +112,16 @@ int main(int argc, char **argv) {
         }
 
         int ns, nr;
-        // write
         ns = write(cfd, requisicao, MAX_MSG);
         if (ns == -1) {
                 perror("write()");
                 return -1;
         }
         
-        // Send file for PUT command
         if (strcmp(tok, "PUT") == 0 && filename != NULL) {
                 send_file(cfd, filename);
         }
         
-        // read
 	bzero(resp, MAX_MSG);
         nr = read(cfd, resp, MAX_MSG);
         if (nr == -1) {

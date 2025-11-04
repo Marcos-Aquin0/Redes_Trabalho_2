@@ -115,7 +115,7 @@ void *handle_client(void *args) {
 					return NULL;
 				}
 				buffer[bytesLidos] = '\0';
-				strcpy(resposta, "200 OK\n");
+				strcpy(resposta, "201 CREATED\n");
 				strcpy(arquivo, buffer);
 				close(fd);
 			}

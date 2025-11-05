@@ -55,7 +55,6 @@ void receive_file(int socket_fd, const char *output_filename) {
     }
 
     close(file_fd);
-    printf("200 OK\n");
 }
 
 int compare(time_t file_time, time_t timestamp) {
@@ -115,7 +114,7 @@ void *handle_client(void *args) {
 					return NULL;
 				}
 				buffer[bytesLidos] = '\0';
-				strcpy(resposta, "201 CREATED\n");
+				strcpy(resposta, "200 OK\n");
 				strcpy(arquivo, buffer);
 				close(fd);
 			}
@@ -133,6 +132,7 @@ void *handle_client(void *args) {
 			char path[256] = "servidor/";
 			strcat(path, basename);
 			receive_file(tclients[cfd].cfd, path);
+			strcpy(resposta, "201 CREATED\n");
 		}
 	} else if (strcmp(command, "DELETE") == 0) {
 		if (filename == NULL) {
